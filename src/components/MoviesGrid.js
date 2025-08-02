@@ -7,6 +7,7 @@ export default function MoviesGrid() {
   const [searchItem, setSearchItem] = useState("");
   const [rating, setRating] = useState("All");
   const [genre, setGenre] = useState("All genre");
+  const [year, setYear] = useState("Default");
   useEffect(() => {
     fetch("movies.json")
       .then((response) => response.json())
@@ -34,9 +35,47 @@ export default function MoviesGrid() {
       genre === "All genre" || movie.genre.toLowerCase() === genre.toLowerCase()
     );
   };
+
+  const mathesRating = (movie, rating) => {
+    switch (rating) {
+      case "All":
+        return true;
+        break;
+
+      case "Good":
+        return movie.rating >= 8;
+        break;
+
+      case "Ok":
+        return movie.rating >= 5 && movie.rating < 8;
+        break;
+      case "Bad":
+        return movie.rating < 5;
+        break;
+      default:
+        return false;
+        break;
+    }
+  };
+
   const filteredSearch = movies.filter((movie) => {
-    return matchesSearchTerms(movie, searchItem) && matchesGenre(movie, genre);
+    return (
+      matchesSearchTerms(movie, searchItem) &&
+      mathesRating(movie, rating) &&
+      matchesGenre(movie, genre)
+    );
   });
+
+  const handleYear = (e) => {
+    setYear(e.target.value);
+  };
+
+  const sortedMovies = [...filteredSearch];
+  if (year === "Ascending") {
+    sortedMovies.sort((a, b) => a.year - b.year);
+  } else if (year === "Descending") {
+    sortedMovies.sort((a, b) => b.year - a.year);
+  }
   return (
     <div>
       <input
@@ -75,9 +114,21 @@ export default function MoviesGrid() {
             <option>Bad</option>
           </select>
         </div>
+        <div className="filter-slot">
+          <label>Released Year</label>
+          <select
+            className="filter-dropdown"
+            value={year}
+            onChange={handleYear}
+          >
+            <option>Default</option>
+            <option>Ascending</option>
+            <option>Descending</option>
+          </select>
+        </div>
       </div>
       <div className="movies-grid">
-        {filteredSearch.map((movie) => (
+        {sortedMovies.map((movie) => (
           <MovieCard movie={movie} key={movie.id} />
         ))}
       </div>

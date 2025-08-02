@@ -24,6 +24,7 @@ export default function MovieCard({ movie }) {
         <p className={`movie-card-rating ${getRatingClass(movie.rating)}`}>
           {movie.rating}
         </p>
+        <p>{movie.year}</p>
       </div>
     </div>
   );
